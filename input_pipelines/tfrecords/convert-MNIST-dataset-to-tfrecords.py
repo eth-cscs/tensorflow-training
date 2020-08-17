@@ -12,7 +12,7 @@ import tensorflow as tf
 from tensorflow.keras.datasets import mnist
 
 
-print('TensorFlow-%s' % tf.VERSION)
+print(f'TensorFlow-{tf.version.VERSION}')
 
 
 def _int64_feature(value):
