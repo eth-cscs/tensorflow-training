@@ -1,1 +1,1 @@
-# Distributed training of simple model on MNIST: TensorFLow+Horovod
+# Distributed training of simple model on MNIST: TensorFlow+Horovod
