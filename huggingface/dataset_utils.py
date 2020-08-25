@@ -1,36 +1,22 @@
 import os
 import numpy as np
-from tokenizers import BertWordPieceTokenizer
-from transformers import BertTokenizer
-
-
-slow_tokenizer = BertTokenizer.from_pretrained("bert-base-uncased",
-                                               cache_dir='./_bert_tockenizer')
-save_path = "bert_tockenizer/"
-if not os.path.exists(save_path):
-    os.makedirs(save_path)
-
-slow_tokenizer.save_pretrained(save_path)
-
-# Load the fast tokenizer from saved file
-tokenizer = BertWordPieceTokenizer("bert_tockenizer/vocab.txt", lowercase=True)
 
 
 def get_training_example_from_squad(train_squad_examples, squad_example):
     """Give the index of the training example corresponding to
-    a give example of the raw SQuAD dataset considering the 
+    a give example of the raw SQuAD dataset considering the
     examples that are skipped."""
     count = 0
     for i in range(squad_example):
         if not train_squad_examples[i].skip:
             count += 1
-    
+
     return count
 
 
 class SquadExample:
     def __init__(self, question, context, start_char_idx, answer_text,
-                 all_answers, max_len):
+                 all_answers, max_len, tokenizer):
         self.question = question
         self.context = context
         self.start_char_idx = start_char_idx
@@ -38,6 +24,7 @@ class SquadExample:
         self.all_answers = all_answers
         self.max_len = max_len
         self.skip = False
+        self.tokenizer = tokenizer
 
     def preprocess(self):
         context = self.context
@@ -62,7 +49,7 @@ class SquadExample:
             is_char_in_ans[idx] = 1
 
         # Tokenize context
-        tokenized_context = tokenizer.encode(context)
+        tokenized_context = self.tokenizer.encode(context)
 
         # Find tokens that were created from answer characters
         ans_token_idx = []
@@ -79,7 +66,7 @@ class SquadExample:
         end_token_idx = ans_token_idx[-1]
 
         # Tokenize question
-        tokenized_question = tokenizer.encode(question)
+        tokenized_question = self.tokenizer.encode(question)
 
         # Create inputs
         input_ids = tokenized_context.ids + tokenized_question.ids[1:]
@@ -107,7 +94,7 @@ class SquadExample:
         self.context_token_to_char = tokenized_context.offsets
 
 
-def create_squad_examples(raw_data, max_len):
+def create_squad_examples(raw_data, max_len, tokenizer):
     squad_examples = []
     for item in raw_data["data"]:
         for para in item["paragraphs"]:
@@ -119,8 +106,7 @@ def create_squad_examples(raw_data, max_len):
                 start_char_idx = qa["answers"][0]["answer_start"]
                 squad_eg = SquadExample(
                     question, context, start_char_idx, answer_text,
-                    all_answers, max_len
-                )
+                    all_answers, max_len, tokenizer)
                 squad_eg.preprocess()
                 squad_examples.append(squad_eg)
     return squad_examples
@@ -135,7 +121,7 @@ def create_inputs_targets(squad_examples):
         "end_token_idx": [],
     }
     for item in squad_examples:
-        if item.skip == False:
+        if not item.skip:
             for key in dataset_dict:
                 dataset_dict[key].append(getattr(item, key))
 
