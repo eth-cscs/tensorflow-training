@@ -1,4 +1,4 @@
-# Examples with `keras-applications`
+# CNNs with `keras-applications`
 Here we consider the distributed training of a CNN model from `keras-applications` for image classification.
 
 This is a simple example intended only to show how to add the code for distributed training from data stored as a set of TFRecord files. The dataset is a randomly drawn subset of ImageNet of about 120000 images.
