@@ -1,4 +1,4 @@
-# Fine-tuning a BERT model for text extraction with the [SQuAD dataset](https://rajpurkar.github.io/SQuAD-explorer/)
+# Fine-tuning a BERT model for text extraction with [the SQuAD dataset](https://rajpurkar.github.io/SQuAD-explorer/)
 
 We are going to fine-tune BERT (from [HuggingFace Transformers](https://github.com/huggingface/transformers)) for the text-extraction task with a dataset of questions and answers. The questions are about a given paragraph (*context*) that contains the answers. The model will be trained to locate the answer in the context by giving the possitions where the answer starts and finishes.
 
