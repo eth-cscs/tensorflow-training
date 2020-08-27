@@ -4,9 +4,6 @@
 # https://github.com/tensorflow/tensorflow/blob/r1.12/tensorflow/examples/how_tos/reading_data/
 # at the TensorFlow repository.
 #
-# The deprecated `from tensorflow.examples.tutorials.mnist import mnist` was
-# replaced by `keras.datasets.mnist`.
-
 import os
 import tensorflow as tf
 from tensorflow.keras.datasets import mnist
