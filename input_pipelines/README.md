@@ -9,3 +9,4 @@
 7. [Converting MNIST dataset to TFRecord file](tfrecords/convert-MNIST-dataset-to-tfrecords.py)
 8. [Decoding a TFRecord file from ImageNet](tfrecords/decoding-imagenet.ipynb)
 9. [MNIST example](feeding_models/keras_MNIST.ipynb)
+10. [Understanding input pipeline optimizations](pipeline-timeline.ipynb)
