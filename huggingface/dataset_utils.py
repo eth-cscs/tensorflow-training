@@ -108,8 +108,9 @@ def create_squad_examples(raw_data, max_len, tokenizer):
                     question, context, start_char_idx, answer_text,
                     all_answers, max_len, tokenizer)
                 squad_eg.preprocess()
-                squad_examples.append(squad_eg)
-    return squad_examples
+                if not squad_eg.skip:
+                    squad_examples.append(squad_eg)
+    return np.array(squad_examples)
 
 
 def create_inputs_targets(squad_examples, shuffle=False, seed=0):
