@@ -112,7 +112,7 @@ def create_squad_examples(raw_data, max_len, tokenizer):
     return squad_examples
 
 
-def create_inputs_targets(squad_examples):
+def create_inputs_targets(squad_examples, shuffle=False, seed=0):
     dataset_dict = {
         "input_ids": [],
         "token_type_ids": [],
@@ -120,6 +120,11 @@ def create_inputs_targets(squad_examples):
         "start_token_idx": [],
         "end_token_idx": [],
     }
+
+    if shuffle:
+        np.random.seed(seed)
+        np.random.shuffle(squad_examples)
+
     for item in squad_examples:
         if not item.skip:
             for key in dataset_dict:
