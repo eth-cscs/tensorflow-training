@@ -24,5 +24,5 @@ Next we are going to learn to write and read TFRecord files. TFRecord is the rec
   10. [Decoding a TFRecord file from ImageNet](tfrecords/decoding-imagenet.ipynb)
  
 A full example including building an input pipeline and training a model is shown in the last notebook:
- 11. [MNIST example](feeding_models/keras_MNIST.ipynb)
+ 11. [MNIST example](mnist)
 
