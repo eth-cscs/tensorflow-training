@@ -1,6 +1,7 @@
 import os
 import glob
 import tensorflow as tf
+import tensorflow_addons as tfa
 import horovod.tensorflow.keras as hvd
 from datetime import datetime
 
@@ -19,8 +20,8 @@ def decode(serialized_example):
         })
     image = tf.image.decode_jpeg(features['image/encoded'], channels=3)
     image = tf.image.resize(image, image_shape, method='bicubic')
-    label = tf.cast(features['image/class/label'], tf.int64)
-    return image, label-1
+    label = tf.cast(features['image/class/label'], tf.int64) - 1  # [0-999]
+    return image, label
 
 
 list_of_files = glob.glob('/scratch/snx3000/stud50/imagenet/train*')
@@ -38,14 +39,14 @@ model = tf.keras.applications.InceptionV3(weights=None,
                                           input_shape=(*image_shape, 3),
                                           classes=1000)
 
-optimizer = tf.keras.optimizers.SGD(lr=0.01, momentum=0.9)
+optimizer = tfa.optimizers.LAMB(lr=1e-3 * (hvd.size() ** 0.5))
 optimizer = hvd.DistributedOptimizer(optimizer)
 
 model.compile(optimizer=optimizer,
               loss='sparse_categorical_crossentropy',
               metrics=['accuracy'])
 
-hvd_callback = hvd.callbacks.BroadcastGlobalVariablesCallback(0)
+hvd_callback = hvd.callbacks.BroadcastGlobalVariablesCallback(root_rank=0)
 
 tb_callback = tf.keras.callbacks.TensorBoard(log_dir=os.path.join('inceptionv3_logs',
                                                                   datetime.now().strftime("%d-%H%M")),
