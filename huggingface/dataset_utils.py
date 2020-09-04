@@ -2,18 +2,6 @@ import os
 import numpy as np
 
 
-def get_training_example_from_squad(train_squad_examples, squad_example):
-    """Give the index of the training example corresponding to
-    a give example of the raw SQuAD dataset considering the
-    examples that are skipped."""
-    count = 0
-    for i in range(squad_example):
-        if not train_squad_examples[i].skip:
-            count += 1
-
-    return count
-
-
 class SquadExample:
     def __init__(self, question, context, start_char_idx, answer_text,
                  all_answers, max_len, tokenizer):
@@ -94,23 +82,39 @@ class SquadExample:
         self.context_token_to_char = tokenized_context.offsets
 
 
+def process_squad_item(item, max_len, tokenizer):
+    squad_examples = []
+    for para in item["paragraphs"]:
+        context = para["context"]
+        for qa in para["qas"]:
+            question = qa["question"]
+            answer_text = qa["answers"][0]["text"]
+            all_answers = [_["text"] for _ in qa["answers"]]
+            start_char_idx = qa["answers"][0]["answer_start"]
+            squad_eg = SquadExample(
+                question, context, start_char_idx, answer_text,
+                all_answers, max_len, tokenizer)
+            squad_eg.preprocess()
+            if not squad_eg.skip:
+                squad_examples.append(squad_eg)
+    return np.array(squad_examples)
+
+
 def create_squad_examples(raw_data, max_len, tokenizer):
     squad_examples = []
     for item in raw_data["data"]:
-        for para in item["paragraphs"]:
-            context = para["context"]
-            for qa in para["qas"]:
-                question = qa["question"]
-                answer_text = qa["answers"][0]["text"]
-                all_answers = [_["text"] for _ in qa["answers"]]
-                start_char_idx = qa["answers"][0]["answer_start"]
-                squad_eg = SquadExample(
-                    question, context, start_char_idx, answer_text,
-                    all_answers, max_len, tokenizer)
-                squad_eg.preprocess()
-                if not squad_eg.skip:
-                    squad_examples.append(squad_eg)
+        squad_examples.extend(process_squad_item(item, max_len, tokenizer))
     return np.array(squad_examples)
+
+
+def split_xy(squad_eg):
+    x = [
+        squad_eg.input_ids,
+        squad_egtoken_type_ids,
+        squad_eg.attention_mask,
+    ]
+    y = [squad_eg.start_token_idx, squad_eg.end_token_idx]
+    return x, y
 
 
 def create_inputs_targets(squad_examples, shuffle=False, seed=0):
