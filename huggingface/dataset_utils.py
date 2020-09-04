@@ -107,16 +107,6 @@ def create_squad_examples(raw_data, max_len, tokenizer):
     return np.array(squad_examples)
 
 
-def split_xy(squad_eg):
-    x = [
-        squad_eg.input_ids,
-        squad_egtoken_type_ids,
-        squad_eg.attention_mask,
-    ]
-    y = [squad_eg.start_token_idx, squad_eg.end_token_idx]
-    return x, y
-
-
 def create_inputs_targets(squad_examples, shuffle=False, seed=0):
     dataset_dict = {
         "input_ids": [],
@@ -138,10 +128,10 @@ def create_inputs_targets(squad_examples, shuffle=False, seed=0):
     for key in dataset_dict:
         dataset_dict[key] = np.array(dataset_dict[key])
 
-    x = [
+    x = (
         dataset_dict["input_ids"],
         dataset_dict["token_type_ids"],
         dataset_dict["attention_mask"],
-    ]
-    y = [dataset_dict["start_token_idx"], dataset_dict["end_token_idx"]]
+    )
+    y = (dataset_dict["start_token_idx"], dataset_dict["end_token_idx"])
     return x, y
