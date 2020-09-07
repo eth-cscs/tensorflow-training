@@ -58,7 +58,7 @@ else:
 # Set up standard model.
 strategy = tf.distribute.experimental.MultiWorkerMirroredStrategy(
     cluster_resolver=tf.distribute.cluster_resolver.SlurmClusterResolver(),
-    communication=tf.distribute.experimental.CollectiveCommunication.NCCL,
+#     communication=tf.distribute.experimental.CollectiveCommunication.NCCL,
 )
 
 with strategy.scope():
@@ -115,7 +115,6 @@ if rank == 0:
 # Train the model.
 model.fit(
     dataset,
-    batch_size=args.batch_size,
     steps_per_epoch=steps_per_epoch,
     # validation_data=dataset,
     # validation_steps=steps_per_epoch,
@@ -124,9 +123,8 @@ model.fit(
     verbose=0,
 )
 
-print(model.evaluate(
-    dataset,
-    batch_size=args.batch_size,
-    steps=args.num_batches_per_iter,
-))
-print(rank, dataset.take(1).shape)
+# print(model.evaluate(
+#     dataset,
+#     batch_size=args.batch_size,
+#     steps=args.num_batches_per_iter,
+# ))

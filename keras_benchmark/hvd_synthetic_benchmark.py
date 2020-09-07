@@ -134,7 +134,6 @@ if hvd.rank() == 0:
 # Train the model.
 model.fit(
     dataset,
-    batch_size=args.batch_size,
     steps_per_epoch=steps_per_epoch,
     # validation_data=dataset,
     # validation_steps=steps_per_epoch,
@@ -143,9 +142,8 @@ model.fit(
     verbose=0,
 )
 
-print(model.evaluate(
-    dataset,
-    batch_size=args.batch_size,
-    steps=args.num_batches_per_iter,
-))
-print(hvd.rank(), dataset.take(1).shape)
+# print(model.evaluate(
+#     dataset,
+#     batch_size=args.batch_size,
+#     steps=args.num_batches_per_iter,
+# ))
